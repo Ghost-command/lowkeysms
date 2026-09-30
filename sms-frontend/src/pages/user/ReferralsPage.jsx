@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import axios from 'axios'
 import { useAuthStore } from '../../store/authStore'
-import { toast } from 'react-toastify'
-import { FaCopy, FaMoneyBillWave, FaUsers, FaChartLine } from 'react-line-icons'
+import { toast } from 'sonner'
 
 export default function ReferralsPage() {
   const { user } = useAuthStore()
