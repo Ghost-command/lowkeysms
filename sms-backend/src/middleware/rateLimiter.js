@@ -15,6 +15,7 @@ const createLimiter = (windowMs, max, message) => {
     standardHeaders: true, 
     legacyHeaders: false,
     passOnStoreError: true, // Graceful degradation: never fail user requests on store errors
+    skip: (req) => req.method === 'OPTIONS',
     store 
   })
 }

@@ -24,16 +24,18 @@ const register = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Username, email, and password are required')
   }
 
-  const isValidTurnstile = await verifyTurnstile(turnstileToken)
-  if (!isValidTurnstile) {
-    throw new ApiError(400, 'Invalid captcha token. Please try again.')
+  if (!req.turnstileVerified && turnstileToken) {
+    const isValidTurnstile = await verifyTurnstile(turnstileToken)
+    if (!isValidTurnstile) {
+      throw new ApiError(400, 'Invalid captcha token. Please try again.')
+    }
   }
 
   const existingEmail = await User.findOne({ email: email.toLowerCase() })
-  if (existingEmail) throw new ApiError(400, 'Email already in use')
+  if (existingEmail) throw new ApiError(409, 'Email already in use')
 
   const existingUsername = await User.findOne({ username: username.toLowerCase() })
-  if (existingUsername) throw new ApiError(400, 'Username already in use')
+  if (existingUsername) throw new ApiError(409, 'Username already in use')
 
   const hashedPassword = await bcrypt.hash(password, 12)
 
@@ -109,9 +111,11 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Please provide email/username and password')
   }
 
-  const isValidTurnstile = await verifyTurnstile(turnstileToken)
-  if (!isValidTurnstile) {
-    throw new ApiError(400, 'Invalid captcha token. Please try again.')
+  if (!req.turnstileVerified && turnstileToken) {
+    const isValidTurnstile = await verifyTurnstile(turnstileToken)
+    if (!isValidTurnstile) {
+      throw new ApiError(400, 'Invalid captcha token. Please try again.')
+    }
   }
 
   console.log('Login attempt:', emailOrUsername)

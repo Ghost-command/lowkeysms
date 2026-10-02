@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
+  const [formError, setFormError] = useState(null)
 
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || ''
 
@@ -25,12 +26,18 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setFormError(null)
+
     if (!emailOrUsername.trim() || !password.trim()) {
-      toast.error('Please enter both email/username and password.')
+      const msg = 'Please enter both email/username and password.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
     if (turnstileSiteKey && !turnstileToken) {
-      toast.error('Please complete the security check.')
+      const msg = 'Please complete the security check.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
 
@@ -43,15 +50,15 @@ export default function LoginPage() {
         toast.success(`Welcome back, ${data.user.username}!`)
         navigate(data.user.role === 'admin' ? '/admin' : '/dashboard')
       } else {
-        toast.error('Invalid response format from server')
+        const msg = 'Invalid response format from server.'
+        setFormError(msg)
+        toast.error(msg)
       }
     } catch (err) {
       const data = err.response?.data
-      if (data?.errors && Array.isArray(data.errors)) {
-        toast.error(data.errors[0].message)
-      } else {
-        toast.error(data?.message || 'Login failed. Please check your credentials.')
-      }
+      const errorMsg = data?.errors?.[0]?.message || data?.message || (err.message === 'Network Error' ? 'Network error: Unable to connect to authentication server. Please check your connection or CORS settings.' : 'Login failed. Please check your credentials.')
+      setFormError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -91,6 +98,12 @@ export default function LoginPage() {
           
           <CardContent className="pt-8">
             <form onSubmit={handleSubmit} className="space-y-5">
+              {formError && (
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-start gap-2.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <span className="material-symbols-outlined text-[18px] shrink-0 text-red-400">error</span>
+                  <span className="leading-relaxed font-medium">{formError}</span>
+                </div>
+              )}
               <div className="space-y-1.5">
                 <label className="font-label-sm text-[12px] uppercase tracking-wider text-outline font-medium">Email or Username</label>
                 <div className="relative">

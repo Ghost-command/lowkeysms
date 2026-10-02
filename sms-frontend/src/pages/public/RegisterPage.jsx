@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
+  const [formError, setFormError] = useState(null)
 
   const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || ''
 
@@ -27,25 +28,36 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setFormError(null)
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match.')
+      const msg = 'Passwords do not match.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
     if (password.length < 8) {
-      toast.error('Password must be at least 8 characters long.')
+      const msg = 'Password must be at least 8 characters long.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
     if (!/[A-Z]/.test(password)) {
-      toast.error('Password must contain at least one uppercase letter.')
+      const msg = 'Password must contain at least one uppercase letter.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
     if (!/[0-9]/.test(password)) {
-      toast.error('Password must contain at least one number.')
+      const msg = 'Password must contain at least one number.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
     if (turnstileSiteKey && !turnstileToken) {
-      toast.error('Please complete the security check.')
+      const msg = 'Please complete the security check.'
+      setFormError(msg)
+      toast.error(msg)
       return
     }
 
@@ -69,12 +81,9 @@ export default function RegisterPage() {
       }
     } catch (err) {
       const data = err.response?.data
-      if (data?.errors && Array.isArray(data.errors)) {
-        // Validation errors (422)
-        toast.error(data.errors[0].message)
-      } else {
-        toast.error(data?.message || 'Registration failed. Please check input values.')
-      }
+      const errorMsg = data?.errors?.[0]?.message || data?.message || (err.message === 'Network Error' ? 'Network error: Unable to connect to authentication server. Please check your connection or CORS settings.' : 'Registration failed. Please check input values.')
+      setFormError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -114,6 +123,12 @@ export default function RegisterPage() {
           
           <CardContent className="pt-8">
             <form onSubmit={handleSubmit} className="space-y-4">
+              {formError && (
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-start gap-2.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <span className="material-symbols-outlined text-[18px] shrink-0 text-red-400">error</span>
+                  <span className="leading-relaxed font-medium">{formError}</span>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="font-label-sm text-[12px] uppercase tracking-wider text-outline font-medium">Username</label>

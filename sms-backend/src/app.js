@@ -19,17 +19,55 @@ app.use((req, res, next) => {
   next()
 })
 
-// Security & utilities
-app.use(helmet())
-app.use(compression())
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
+// CORS Configuration
+const allowedOrigins = [
+  'https://lowkeysms.com',
+  'https://www.lowkeysms.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:5173',
+]
 
-// CORS
-app.use(cors({
-  origin: (origin, callback) => callback(null, true),
+if (process.env.CLIENT_URL) allowedOrigins.push(process.env.CLIENT_URL.replace(/\/$/, ''))
+if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL.replace(/\/$/, ''))
+
+const lowkeyDomainRegex = /^https:\/\/(?:[a-zA-Z0-9-]+\.)*lowkeysms\.com$/
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true)
+
+    if (allowedOrigins.includes(origin) || lowkeyDomainRegex.test(origin)) {
+      return callback(null, true)
+    }
+
+    if (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost:')) {
+      return callback(null, true)
+    }
+
+    console.warn(`[CORS] Blocked request from origin: ${origin}`)
+    return callback(new Error(`Origin ${origin} not allowed by CORS`))
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400,
+  optionsSuccessStatus: 200,
+}
+
+// Enable CORS and explicit preflight handling BEFORE any rate limiters or parsers
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
+
+// Security & utilities
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
 }))
+app.use(compression())
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 
 // Global rate limiter
 app.use(globalLimiter)

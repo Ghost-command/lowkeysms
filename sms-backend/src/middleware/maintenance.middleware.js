@@ -5,6 +5,9 @@ const SiteSettings = require('../models/SiteSettings')
 const checkMaintenance = (feature) => {
   return async (req, res, next) => {
     try {
+      // 0. Preflight OPTIONS requests bypass maintenance entirely
+      if (req.method === 'OPTIONS') return next()
+
       // 1. Admins bypass this middleware entirely
       let isAdmin = false
       

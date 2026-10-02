@@ -6,7 +6,11 @@ const validate = (req, res, next) => {
   if (!errors.isEmpty()) {
     console.log('422 errors:', JSON.stringify(errors.array(), null, 2))
     const messages = errors.array().map(e => ({ field: e.path, message: e.msg }))
-    return res.status(422).json({ errors: messages })
+    return res.status(422).json({
+      success: false,
+      message: messages[0]?.message || 'Validation error',
+      errors: messages,
+    })
   }
   next()
 }
