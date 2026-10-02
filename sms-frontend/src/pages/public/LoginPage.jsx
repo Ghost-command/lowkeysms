@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
 
-  const turnstileSiteKey = import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || ''
 
   const { setAuth } = useAuthStore()
   const navigate = useNavigate()
@@ -29,8 +29,8 @@ export default function LoginPage() {
       toast.error('Please enter both email/username and password.')
       return
     }
-    if (!turnstileToken) {
-      toast.error('Please complete the captcha.')
+    if (turnstileSiteKey && !turnstileToken) {
+      toast.error('Please complete the security check.')
       return
     }
 
@@ -71,11 +71,11 @@ export default function LoginPage() {
         <div className="text-center mb-8 flex flex-col items-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-6 transition-opacity hover:opacity-90">
             <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-white font-bold text-lg shadow-[0_0_20px_rgba(224,122,62,0.4)]">
-              P
+              L
             </div>
             <div className="flex flex-col items-start">
               <span className="font-headline-sm text-[24px] tracking-tight text-on-surface leading-none font-semibold">
-                Ping<span className="text-primary">SMS</span>
+                Lowkey<span className="text-primary">SMS</span>
               </span>
               <span className="font-label-sm text-[10px] tracking-widest uppercase text-outline leading-tight">
                 Authentication
@@ -133,13 +133,17 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="flex justify-center mt-2">
-                <Turnstile 
-                  siteKey={turnstileSiteKey} 
-                  onSuccess={(token) => setTurnstileToken(token)} 
-                  options={{ theme: 'dark' }} 
-                />
-              </div>
+              {turnstileSiteKey && (
+                <div className="flex justify-center mt-2">
+                  <Turnstile 
+                    siteKey={turnstileSiteKey} 
+                    onSuccess={(token) => setTurnstileToken(token)} 
+                    onError={() => setTurnstileToken('')}
+                    onExpire={() => setTurnstileToken('')}
+                    options={{ theme: 'dark' }} 
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"

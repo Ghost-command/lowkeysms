@@ -5,16 +5,17 @@ const { initializePayment: initializePaystack } = require('../services/paystack.
 const { generateDepositReference } = require('../utils/generateReference')
 const ApiError = require('../utils/ApiError')
 const asyncHandler = require('../utils/asyncHandler')
-const Redis = require('ioredis')
-
-const redisClient = process.env.REDIS_URI ? new Redis(process.env.REDIS_URI) : new Redis()
+const { getRedis } = require('../config/redis')
 
 // GET /api/wallet/balance
 const getBalance = asyncHandler(async (req, res) => {
   let fxRate = 1500 // fallback
   try {
-    const rate = await redisClient.get('fx_rate_usd_ngn')
-    if (rate) fxRate = parseFloat(rate)
+    const redis = getRedis()
+    if (redis) {
+      const rate = await redis.get('fx_rate_usd_ngn')
+      if (rate) fxRate = parseFloat(rate)
+    }
   } catch (err) {}
 
   res.json({
@@ -40,9 +41,14 @@ const initiateDeposit = asyncHandler(async (req, res) => {
   // Convert USD deposit intention to NGN minimum requirement check
   if (currency === 'usd') {
     try {
-      const rate = await redisClient.get('fx_rate_usd_ngn')
-      if (rate) exchangeRate = parseFloat(rate)
-      else throw new Error('Rate not found')
+      const redis = getRedis()
+      if (redis) {
+        const rate = await redis.get('fx_rate_usd_ngn')
+        if (rate) exchangeRate = parseFloat(rate)
+        else throw new Error('Rate not found')
+      } else {
+        throw new Error('Redis not connected')
+      }
     } catch (err) {
       exchangeRate = 1500 // Safe fallback
     }

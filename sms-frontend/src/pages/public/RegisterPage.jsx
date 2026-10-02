@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Turnstile } from '@marsidev/react-turnstile'
+import { register as registerApi } from '../../api/auth'
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton'
 import { useAuthStore } from '../../store/authStore'
 import { Button } from '../../components/ui/button'
@@ -19,7 +20,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
 
-  const turnstileSiteKey = import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || ''
 
   const { setAuth } = useAuthStore()
   const navigate = useNavigate()
@@ -43,8 +44,8 @@ export default function RegisterPage() {
       toast.error('Password must contain at least one number.')
       return
     }
-    if (!turnstileToken) {
-      toast.error('Please complete the captcha.')
+    if (turnstileSiteKey && !turnstileToken) {
+      toast.error('Please complete the security check.')
       return
     }
 
@@ -60,7 +61,7 @@ export default function RegisterPage() {
       const data = res.data
       if (data && data.accessToken && data.user) {
         setAuth(data.user, data.accessToken)
-        toast.success(`Account created! Welcome to Ping SMS, ${data.user.username}.`)
+        toast.success(`Account created! Welcome to LowkeySMS, ${data.user.username}.`)
         navigate('/dashboard')
       } else {
         toast.success('Account created! Please log in.')
@@ -93,11 +94,11 @@ export default function RegisterPage() {
         <div className="text-center mb-6 flex flex-col items-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-4 transition-opacity hover:opacity-90">
             <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-white font-bold text-lg shadow-[0_0_20px_rgba(224,122,62,0.4)]">
-              P
+              L
             </div>
             <div className="flex flex-col items-start">
               <span className="font-headline-sm text-[24px] tracking-tight text-on-surface leading-none font-semibold">
-                Ping<span className="text-primary">SMS</span>
+                Lowkey<span className="text-primary">SMS</span>
               </span>
               <span className="font-label-sm text-[10px] tracking-widest uppercase text-outline leading-tight">
                 Authentication
@@ -196,13 +197,17 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="flex justify-center mt-2">
-                <Turnstile 
-                  siteKey={turnstileSiteKey} 
-                  onSuccess={(token) => setTurnstileToken(token)} 
-                  options={{ theme: 'dark' }} 
-                />
-              </div>
+              {turnstileSiteKey && (
+                <div className="flex justify-center mt-2">
+                  <Turnstile 
+                    siteKey={turnstileSiteKey} 
+                    onSuccess={(token) => setTurnstileToken(token)} 
+                    onError={() => setTurnstileToken('')}
+                    onExpire={() => setTurnstileToken('')}
+                    options={{ theme: 'dark' }} 
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"

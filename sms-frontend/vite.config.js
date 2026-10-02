@@ -13,8 +13,8 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Ping SMS Global Services',
-        short_name: 'Ping SMS',
+        name: 'LowkeySMS Global Services',
+        short_name: 'LowkeySMS',
         description: 'Virtual numbers and real-time OTP inbox',
         theme_color: '#0a0d14',
         background_color: '#0a0d14',
@@ -71,7 +71,12 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-      }
+      },
+      '/socket.io': {
+        target: 'http://localhost:5000',
+        ws: true,
+        changeOrigin: true,
+      },
     }
   }
 })

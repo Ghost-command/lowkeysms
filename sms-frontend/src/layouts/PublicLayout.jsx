@@ -42,11 +42,11 @@ export default function PublicLayout({ children }) {
           <div className="flex items-center gap-space-lg shrink-0">
             <Link to="/" className="flex items-center gap-space-xs transition-opacity hover:opacity-90">
               <div className="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-white font-bold text-sm shadow-[0_0_15px_rgba(224,122,62,0.5)]">
-                P
+                L
               </div>
               <div className="flex flex-col">
                 <span className="font-headline-sm text-[20px] tracking-tight text-on-surface leading-none font-semibold">
-                  Ping<span className="text-primary">SMS</span>
+                  Lowkey<span className="text-primary">SMS</span>
                 </span>
                 <span className="font-label-sm text-[9px] tracking-widest uppercase text-outline leading-tight">
                   Carrier Grid
@@ -170,10 +170,10 @@ export default function PublicLayout({ children }) {
             <div className="flex items-center gap-space-md">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded bg-primary-container flex items-center justify-center text-white font-bold text-xs opacity-80">
-                  P
+                  L
                 </div>
                 <span className="font-headline-sm text-[16px] font-semibold tracking-tight text-on-surface">
-                  Ping<span className="text-primary">SMS</span>
+                  Lowkey<span className="text-primary">SMS</span>
                 </span>
               </div>
               <span className="text-outline-variant font-body-sm hidden md:inline">|</span>
@@ -187,7 +187,7 @@ export default function PublicLayout({ children }) {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-space-sm pt-space-md text-outline font-body-sm text-[12px]">
-            <div>© {new Date().getFullYear()} Ping SMS Infrastructure Ltd. All rights reserved.</div>
+            <div>© {new Date().getFullYear()} LowkeySMS Infrastructure Ltd. All rights reserved.</div>
             <div className="flex items-center gap-space-xs font-code-md text-[11px]">
               <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
               <span>Operational Latency &lt; 240ms</span>

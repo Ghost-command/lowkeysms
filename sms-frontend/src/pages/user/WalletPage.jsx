@@ -248,7 +248,7 @@ export default function WalletPage() {
                         </div>
                         <div className="flex justify-between items-center pb-3 border-b border-white/5">
                           <span>Account Name:</span>
-                          <strong className="text-on-surface">Ping SMS Global Services</strong>
+                          <strong className="text-on-surface">LowkeySMS Global Services</strong>
                         </div>
                         <div className="flex justify-between items-center">
                           <span>Amount to Transfer:</span>

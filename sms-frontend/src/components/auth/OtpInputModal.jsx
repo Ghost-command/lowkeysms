@@ -125,7 +125,7 @@ export default function OtpInputModal({
     }
   }
 
-  const turnstileSiteKey = import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || ''
 
   return (
     <AnimatePresence>
@@ -181,13 +181,17 @@ export default function OtpInputModal({
             </div>
 
             {/* Turnstile Captcha Widget */}
-            <div className="flex justify-center my-2">
-              <Turnstile
-                siteKey={turnstileSiteKey}
-                onSuccess={(token) => setTurnstileToken(token)}
-                options={{ theme: 'dark', size: 'compact' }}
-              />
-            </div>
+            {turnstileSiteKey && (
+              <div className="flex justify-center my-2">
+                <Turnstile
+                  siteKey={turnstileSiteKey}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => setTurnstileToken('')}
+                  onExpire={() => setTurnstileToken('')}
+                  options={{ theme: 'dark', size: 'compact' }}
+                />
+              </div>
+            )}
 
             {/* Actions */}
             <button

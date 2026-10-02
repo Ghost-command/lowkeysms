@@ -23,13 +23,13 @@ export default function ForgotPasswordPage() {
   const [resetSuccess, setResetSuccess] = useState(false)
 
   const navigate = useNavigate()
-  const turnstileSiteKey = import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || import.meta.env.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || import.meta.env.VITE_CLOUDFLARE_TURNSTILE_SITE_KEY || ''
 
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(schema) })
 
   const onSubmit = async ({ email }) => {
-    if (!turnstileToken) {
-      toast.error('Please complete the captcha.')
+    if (turnstileSiteKey && !turnstileToken) {
+      toast.error('Please complete the security check.')
       return
     }
 
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
             <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg,#D4AF37,#FFD700)', borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ZapIcon size={22} color="#000" strokeWidth={2.5} />
             </div>
-            <span style={{ fontSize: 22, fontWeight: 800 }}><span className="gold-text">Lowkey</span> SMS</span>
+            <span style={{ fontSize: 22, fontWeight: 800 }}><span className="gold-text">Lowkey</span>SMS</span>
           </Link>
           <h1 style={{ fontSize: 24, fontWeight: 700 }}>Forgot Password</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 6 }}>Enter your email to receive a 6-digit OTP code</p>
@@ -105,13 +105,17 @@ export default function ForgotPasswordPage() {
                 {errors.email && <span className="form-error">{errors.email.message}</span>}
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0' }}>
-                <Turnstile
-                  siteKey={turnstileSiteKey}
-                  onSuccess={(token) => setTurnstileToken(token)}
-                  options={{ theme: 'dark', size: 'compact' }}
-                />
-              </div>
+              {turnstileSiteKey && (
+                <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0' }}>
+                  <Turnstile
+                    siteKey={turnstileSiteKey}
+                    onSuccess={(token) => setTurnstileToken(token)}
+                    onError={() => setTurnstileToken('')}
+                    onExpire={() => setTurnstileToken('')}
+                    options={{ theme: 'dark', size: 'compact' }}
+                  />
+                </div>
+              )}
 
               <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%', padding: 13 }}>
                 {loading ? <span className="spinner" /> : 'Send 6-Digit OTP'}

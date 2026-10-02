@@ -14,7 +14,7 @@ export default function SupportChatWidget() {
   const [aiMessages, setAiMessages] = useState([
     {
       role: 'assistant',
-      content: `Hello! 👋 I'm Ping SMS AI Support Assistant. How can I help you today? Ask me about number activation, pricing, deposits, or any issues you're facing!`,
+      content: `Hello! 👋 I'm LowkeySMS AI Support Assistant. How can I help you today? Ask me about number activation, pricing, deposits, or any issues you're facing!`,
     },
   ])
   const [inputMessage, setInputMessage] = useState('')
@@ -163,7 +163,7 @@ export default function SupportChatWidget() {
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-white text-base leading-tight">Ping Support Assistant</h3>
+                  <h3 className="font-display font-bold text-white text-base leading-tight">Lowkey Support Assistant</h3>
                   <p className="text-xs text-emerald-400 flex items-center gap-1 font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> DeepSeek AI Online
                   </p>

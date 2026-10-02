@@ -1,28 +1,44 @@
+require('dotenv').config()
 const Redis = require('ioredis')
 
 let redisClient = null
 
 const connectRedis = async () => {
-  redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: 3,
-    enableReadyCheck: true,
-    lazyConnect: true,
-  })
+  const redisUrl = process.env.REDIS_URL ? process.env.REDIS_URL.trim() : null
 
-  redisClient.on('connect', () => console.log('✅ Redis connected'))
-  redisClient.on('error', (err) => console.error(`❌ Redis error: ${err.message}`))
+  if (!redisUrl) {
+    console.warn('⚠️  REDIS_URL not configured. Running without Redis (in-memory rate limiting, token blacklist disabled).')
+    redisClient = null
+    return null
+  }
 
   try {
+    redisClient = new Redis(redisUrl, {
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      enableReadyCheck: true,
+      retryStrategy(times) {
+        const maxAttempts = 3
+        if (times > maxAttempts) {
+          console.warn(`⚠️  Redis reconnection limit reached (${maxAttempts} attempts). Disabling reconnection.`)
+          return null // Stop reconnection attempts
+        }
+        return Math.min(times * 500, 2000)
+      }
+    })
+
+    redisClient.on('connect', () => console.log('✅ Redis connected'))
+    redisClient.on('error', (err) => console.error(`❌ Redis error: ${err.message}`))
+
     await redisClient.connect()
   } catch (err) {
-    console.error(`❌ Redis connection failed: ${err.message}`)
+    console.error(`❌ Redis connection failed: ${err.message}. Continuing in degraded mode without Redis.`)
     try {
-      redisClient.disconnect()
-    } catch (disconnectErr) {
-      // Ignore disconnect error
-    }
+      if (redisClient) {
+        redisClient.disconnect(false)
+      }
+    } catch (disconnectErr) {}
     redisClient = null
-    // Non-fatal: app continues without Redis (caching/blacklisting degraded)
   }
 
   return redisClient
@@ -30,4 +46,19 @@ const connectRedis = async () => {
 
 const getRedis = () => redisClient
 
-module.exports = { connectRedis, getRedis }
+const disconnectRedis = async () => {
+  if (redisClient) {
+    try {
+      await redisClient.quit()
+    } catch {
+      try {
+        redisClient.disconnect(false)
+      } catch {}
+    }
+    redisClient = null
+    console.log('Redis Connection Closed')
+  }
+}
+
+module.exports = { connectRedis, getRedis, disconnectRedis }
+

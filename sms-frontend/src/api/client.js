@@ -1,10 +1,18 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
 
+const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_URL || '/api'
+  if (!url.endsWith('/api')) {
+    url = url.endsWith('/') ? `${url}api` : `${url}/api`
+  }
+  return url
+}
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
-  withCredentials: false,
+  withCredentials: true,
 })
 
 // Inject JWT token on every request

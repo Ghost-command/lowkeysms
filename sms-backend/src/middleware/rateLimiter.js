@@ -3,8 +3,9 @@ const RedisStore = require('rate-limit-redis')
 const { getRedis } = require('../config/redis')
 
 const createLimiter = (windowMs, max, message) => {
-  const store = getRedis() ? new RedisStore({
-    sendCommand: (...args) => getRedis().sendCommand(args)
+  const redis = getRedis()
+  const store = redis ? new RedisStore({
+    sendCommand: (...args) => redis.call(...args)
   }) : undefined
 
   return rateLimit({ 
@@ -13,6 +14,7 @@ const createLimiter = (windowMs, max, message) => {
     message: { success: false, message }, 
     standardHeaders: true, 
     legacyHeaders: false,
+    passOnStoreError: true, // Graceful degradation: never fail user requests on store errors
     store 
   })
 }

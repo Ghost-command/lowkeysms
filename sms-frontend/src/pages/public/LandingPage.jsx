@@ -18,8 +18,8 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      q: 'What is Ping SMS and how does it work?',
-      a: 'Ping SMS provides temporary virtual phone numbers to receive SMS verification codes (OTPs) online instantly, preserving your personal phone number privacy.',
+      q: 'What is LowkeySMS and how does it work?',
+      a: 'LowkeySMS provides temporary virtual phone numbers to receive SMS verification codes (OTPs) online instantly, preserving your personal phone number privacy.',
     },
     {
       q: 'How long do virtual numbers stay active?',
@@ -34,7 +34,7 @@ export default function LandingPage() {
       a: 'You can instantly top up your wallet using Debit Cards, Direct Bank Transfers to your unique virtual account, or Crypto.',
     },
     {
-      q: 'Can developers integrate Ping SMS via API?',
+      q: 'Can developers integrate LowkeySMS via API?',
       a: 'Yes! We provide full REST APIs and WebSocket support for high-throughput automated provisioning.',
     }
   ]

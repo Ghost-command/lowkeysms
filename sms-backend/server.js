@@ -3,10 +3,10 @@ const http = require('http')
 const { Server } = require('socket.io')
 const app = require('./src/app')
 const { connectDB, disconnectDB } = require('./src/config/db')
-const { connectRedis } = require('./src/config/redis')
+const { connectRedis, disconnectRedis } = require('./src/config/redis')
 const { startSmsPoller } = require('./src/jobs/smsPoller.job')
 const { startOrderExpiryJob } = require('./src/jobs/orderExpiry.job')
-require('./src/jobs/fxRateJob') // Initializes and schedules FX cron job
+const { startFxRateJob } = require('./src/jobs/fxRateJob')
 const { setIo } = require('./src/utils/socket')
 const socketAuth = require('./src/middleware/socketAuth')
 
@@ -18,6 +18,7 @@ const start = async () => {
 
   startSmsPoller()
   startOrderExpiryJob()
+  startFxRateJob()
 
   const server = http.createServer(app)
   const io = new Server(server, {
@@ -53,6 +54,7 @@ const start = async () => {
     console.log(`\n${signal} received. Shutting down gracefully...`)
     server.close(async () => {
       await disconnectDB()
+      await disconnectRedis()
       process.exit(0)
     })
   }

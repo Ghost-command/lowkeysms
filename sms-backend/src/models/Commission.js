@@ -36,6 +36,5 @@ const commissionSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 commissionSchema.index({ affiliate: 1 })
-commissionSchema.index({ txRef: 1 }, { unique: true })
 
 module.exports = mongoose.model('Commission', commissionSchema)

@@ -29,11 +29,11 @@ export function Header({ onMobileMenuToggle }) {
 
         <Link to="/" className="flex items-center gap-space-xs transition-opacity hover:opacity-90 min-w-0">
           <div className="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-white font-bold text-sm shadow-[0_0_15px_rgba(224,122,62,0.5)] flex-shrink-0">
-            P
+            L
           </div>
           <div className="flex flex-col min-w-0 hidden sm:flex">
             <span className="font-headline-sm text-[20px] tracking-tight text-on-surface leading-none font-semibold truncate">
-              Ping<span className="text-primary">SMS</span>
+              Lowkey<span className="text-primary">SMS</span>
             </span>
             <span className="font-label-sm text-[9px] tracking-widest uppercase text-outline leading-tight mt-0.5 truncate">
               Carrier Grid
